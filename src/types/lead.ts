@@ -47,6 +47,26 @@ export type RetainerStatus =
 
 export type SettlementConfidence = "Low" | "Medium" | "High";
 
+// The dashboard list/detail shape returned by GET /api/leads (headline fields).
+// Full case detail (incident/injury/etc.) arrives with the API-layer PRD.
+export interface LeadSummary {
+  id: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  caseType: CaseType;
+  incidentDate?: string;
+  qualificationStatus: QualificationStatus;
+  leadScore: number;
+  leadTemperature: LeadTemperature;
+  settlementExpected?: number;
+  pipelineStatus: PipelineStatus;
+  retainerStatus: RetainerStatus;
+  missingDocuments: number;
+  aiSummary?: string;
+  updatedAt: string;
+}
+
 export interface Lead {
   id: string;
   fullName: string;

@@ -4,21 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth/actions";
+import { useAuth } from "@/components/auth/auth-provider";
 import { BrandMark } from "@/components/brand";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { TopBar } from "@/components/layout/top-bar";
 
 // Nav + account/sign-out — shared by the desktop sidebar and the mobile drawer.
 function SidebarBody({
-  userEmail,
+  userLabel,
   onNavigate,
 }: {
-  userEmail: string;
+  userLabel: string;
   onNavigate?: () => void;
 }) {
   const router = useRouter();
-  const initials = (userEmail.slice(0, 2) || "ME").toUpperCase();
+  const { signOut } = useAuth();
+  const initials = (userLabel.slice(0, 2) || "ME").toUpperCase();
 
   const handleSignOut = async () => {
     onNavigate?.();
@@ -34,7 +35,7 @@ function SidebarBody({
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 text-xs font-semibold text-foreground">
             {initials}
           </div>
-          <span className="truncate text-xs text-muted-foreground">{userEmail}</span>
+          <span className="truncate text-xs capitalize text-muted-foreground">{userLabel}</span>
         </div>
         <button
           onClick={handleSignOut}
@@ -51,10 +52,10 @@ function SidebarBody({
 // Floating glass shell. Sidebar collapses on desktop (≥ lg) and becomes a
 // slide-in drawer on phones/tablets. Only the right content panel scrolls.
 export function AppShell({
-  userEmail,
+  userLabel,
   children,
 }: {
-  userEmail: string;
+  userLabel: string;
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false); // desktop
@@ -88,7 +89,7 @@ export function AppShell({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <SidebarBody userEmail={userEmail} onNavigate={() => setMobileOpen(false)} />
+        <SidebarBody userLabel={userLabel} onNavigate={() => setMobileOpen(false)} />
       </aside>
 
       {/* Layout row: desktop sidebar + content (only in-flow items) */}
@@ -101,7 +102,7 @@ export function AppShell({
           )}
         >
           <BrandMark />
-          <SidebarBody userEmail={userEmail} />
+          <SidebarBody userLabel={userLabel} />
         </aside>
 
         {/* Right content panel — full width on mobile; only this scrolls */}

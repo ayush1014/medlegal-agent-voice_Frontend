@@ -1,0 +1,62 @@
+// Thin fetch client for the FastAPI backend.
+// - sends cookies (credentials: "include") so the session rides along
+// - adds the firm slug (X-Org-Slug) so the API resolves the org
+// - echoes the CSRF token on mutations (double-submit; token kept in memory)
+
+import { getOrgSlug } from "@/lib/org";
+
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+
+// In-memory CSRF token. Recovered after a reload via GET /api/auth/csrf.
+let csrfToken: string | null = null;
+export function setCsrfToken(token: string | null): void {
+  csrfToken = token;
+}
+
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+    public data?: unknown,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+type Options = { method?: string; body?: unknown };
+
+export async function apiFetch<T>(path: string, opts: Options = {}): Promise<T> {
+  const method = opts.method ?? "GET";
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+  const slug = getOrgSlug();
+  if (slug) headers["X-Org-Slug"] = slug;
+  if (method !== "GET" && csrfToken) headers["X-CSRF-Token"] = csrfToken;
+
+  const res = await fetch(`${BASE}${path}`, {
+    method,
+    headers,
+    credentials: "include",
+    body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+  });
+
+  const text = await res.text();
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+  }
+
+  if (!res.ok) {
+    const detail =
+      (data && typeof data === "object" && "detail" in data
+        ? String((data as { detail: unknown }).detail)
+        : null) ?? res.statusText;
+    throw new ApiError(res.status, detail, data);
+  }
+  return data as T;
+}

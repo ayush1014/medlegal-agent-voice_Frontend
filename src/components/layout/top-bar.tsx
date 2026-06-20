@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { LogOut, PanelLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BrandMark } from "@/components/brand";
-import { signOut } from "@/lib/auth/actions";
+import { useAuth } from "@/components/auth/auth-provider";
 
 // Floating top controls. Left: sidebar toggle (opens the drawer on mobile,
 // collapses the sidebar on desktop) + mobile brand. Right: theme toggle and a
@@ -17,6 +17,7 @@ export function TopBar({
   onToggleDesktop: () => void;
 }) {
   const router = useRouter();
+  const { signOut } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();

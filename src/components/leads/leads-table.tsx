@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, ChevronRight, FileWarning } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Lead, CaseType, QualificationStatus } from "@/types/lead";
+import type { LeadSummary, CaseType, QualificationStatus } from "@/types/lead";
 import { CASE_TYPES, QUALIFICATION_STATUSES } from "@/lib/constants";
-import { fmtCurrencyRange, fmtDate, fmtRelative } from "@/lib/format";
+import { fmtCurrency, fmtDate, fmtRelative } from "@/lib/format";
 import {
   QualificationBadge,
   TemperatureBadge,
@@ -46,7 +46,7 @@ function FilterSelect<T extends string>({
   );
 }
 
-export function LeadsTable({ leads }: { leads: Lead[] }) {
+export function LeadsTable({ leads }: { leads: LeadSummary[] }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [caseType, setCaseType] = useState<CaseType | "all">("all");
@@ -150,7 +150,7 @@ export function LeadsTable({ leads }: { leads: Lead[] }) {
                       <TemperatureBadge temperature={l.leadTemperature} />
                     </td>
                     <td className="px-3 py-3 text-right font-mono tabular-nums text-foreground">
-                      {fmtCurrencyRange(l.settlementLow, l.settlementHigh)}
+                      {fmtCurrency(l.settlementExpected)}
                     </td>
                     <td className="px-3 py-3">
                       <PipelineBadge status={l.pipelineStatus} />
@@ -201,7 +201,7 @@ export function LeadsTable({ leads }: { leads: Lead[] }) {
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                       <span className="font-mono tabular-nums text-foreground">
-                        {fmtCurrencyRange(l.settlementLow, l.settlementHigh)}
+                        {fmtCurrency(l.settlementExpected)}
                       </span>
                       {l.missingDocuments ? (
                         <span className="text-amber-600 dark:text-amber-400">
