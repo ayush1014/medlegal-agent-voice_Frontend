@@ -67,7 +67,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
     setFlash(null);
     try {
       await fn();
-      setFlash(ok);
+      if (ok) setFlash(ok);
       load();
     } catch (e) {
       setFlash(e instanceof ApiError ? e.message : "Action failed");
@@ -117,10 +117,10 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               <GlassButton size="sm" disabled={!!busy} onClick={() => act("rescore", () => rescoreLead(id), "Re-scored.")}>
                 {busy === "rescore" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />} Re-score
               </GlassButton>
-              <GlassButton size="sm" disabled={!!busy} onClick={() => act("docs", () => requestDocuments(id), "Documents requested over WhatsApp.")}>
+              <GlassButton size="sm" disabled={!!busy} onClick={() => act("docs", () => requestDocuments(id), "")}>
                 {busy === "docs" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />} Request documents
               </GlassButton>
-              <GlassButton size="sm" disabled={!!busy} onClick={() => act("retainer", () => sendRetainer(id), "Retainer sent over WhatsApp.")}>
+              <GlassButton size="sm" disabled={!!busy} onClick={() => act("retainer", () => sendRetainer(id), "")}>
                 {busy === "retainer" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileSignature className="h-3.5 w-3.5" />} Send retainer
               </GlassButton>
               {flash ? <span className="text-xs text-muted-foreground">{flash}</span> : null}
