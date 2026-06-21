@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
+  BarChart3,
   PhoneCall,
   Settings,
   type LucideIcon,
@@ -17,6 +18,7 @@ type NavItem = { href: string; label: string; icon: LucideIcon };
 const NAV: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/leads", label: "Leads", icon: Users },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/intake", label: "Intake", icon: PhoneCall },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

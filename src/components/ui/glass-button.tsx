@@ -22,7 +22,8 @@ const glassButtonVariants = cva(
 );
 
 const glassButtonTextVariants = cva(
-  "glass-button-text relative block select-none tracking-tighter",
+  // flex row so the icon + label sit inline (Tailwind preflight makes svg display:block).
+  "glass-button-text relative flex items-center justify-center gap-2 select-none tracking-tighter",
   {
     variants: {
       size: {

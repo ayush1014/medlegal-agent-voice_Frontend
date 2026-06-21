@@ -12,18 +12,35 @@ import {
   Gauge,
   Loader2,
 } from "lucide-react";
-import { getLeads } from "@/lib/api";
+import { Zap } from "lucide-react";
+import { getLeads, runFollowups, ApiError } from "@/lib/api";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { LeadsTable } from "@/components/leads/leads-table";
+import { GlassButton } from "@/components/ui/glass-button";
 import type { LeadSummary } from "@/types/lead";
 
 export default function DashboardPage() {
   const [leads, setLeads] = useState<LeadSummary[] | null>(null);
   const [error, setError] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [flash, setFlash] = useState<string | null>(null);
 
-  useEffect(() => {
-    getLeads().then(setLeads).catch(() => setError(true));
-  }, []);
+  const load = () => getLeads().then(setLeads).catch(() => setError(true));
+  useEffect(() => { load(); }, []);
+
+  async function onRunFollowups() {
+    setRunning(true);
+    setFlash(null);
+    try {
+      const r = await runFollowups();
+      setFlash(`Tick done — ${r.docs_requested} doc requests, ${r.retainers_sent} retainers, ${r.doc_nudges + r.retainer_nudges} nudges.`);
+      await load();
+    } catch (e) {
+      setFlash(e instanceof ApiError ? e.message : "Follow-up run failed");
+    } finally {
+      setRunning(false);
+    }
+  }
 
   if (error) {
     return (
@@ -63,11 +80,20 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Personal injury intake overview and live lead pipeline.
-        </p>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Personal injury intake overview and live lead pipeline.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {flash ? <span className="text-xs text-muted-foreground">{flash}</span> : null}
+          <GlassButton size="sm" disabled={running} onClick={onRunFollowups}>
+            {running ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+            Run follow-ups
+          </GlassButton>
+        </div>
       </header>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

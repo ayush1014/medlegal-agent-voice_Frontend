@@ -60,3 +60,29 @@ export async function apiFetch<T>(path: string, opts: Options = {}): Promise<T> 
   }
   return data as T;
 }
+
+// Multipart upload (FormData). The browser sets the multipart Content-Type +
+// boundary, so we must NOT set Content-Type ourselves.
+export async function apiUpload<T>(path: string, form: FormData): Promise<T> {
+  const headers: Record<string, string> = {};
+  const slug = getOrgSlug();
+  if (slug) headers["X-Org-Slug"] = slug;
+  if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
+
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers,
+    credentials: "include",
+    body: form,
+  });
+  const text = await res.text();
+  let data: unknown = text ? JSON.parse(text) : null;
+  if (!res.ok) {
+    const detail =
+      data && typeof data === "object" && "detail" in data
+        ? String((data as { detail: unknown }).detail)
+        : res.statusText;
+    throw new ApiError(res.status, detail, data);
+  }
+  return data as T;
+}
