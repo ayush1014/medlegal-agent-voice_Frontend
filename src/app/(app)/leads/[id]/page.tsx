@@ -22,6 +22,9 @@ const S = (o: Row | null | undefined, k: string) => (o && o[k] != null ? String(
 const N = (o: Row | null | undefined, k: string) => (o && o[k] != null ? Number(o[k]) : undefined);
 const B = (o: Row | null | undefined, k: string) => Boolean(o && o[k]);
 
+// Recipient an action reported sending to (email or phone), from the API response.
+const sentTo = (r: unknown) => (r as { sent_to?: string } | null)?.sent_to;
+
 function Section({ icon: Icon, title, count, children }: {
   icon: React.ComponentType<{ className?: string }>; title: string; count?: number; children: React.ReactNode;
 }) {
@@ -62,12 +65,13 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
 
   useEffect(load, [load]);
 
-  async function act(name: string, fn: () => Promise<unknown>, ok: string) {
+  async function act(name: string, fn: () => Promise<unknown>, ok: string | ((r: unknown) => string)) {
     setBusy(name);
     setFlash(null);
     try {
-      await fn();
-      if (ok) setFlash(ok);
+      const result = await fn();
+      const msg = typeof ok === "function" ? ok(result) : ok;
+      if (msg) setFlash(msg);
       load();
     } catch (e) {
       setFlash(e instanceof ApiError ? e.message : "Action failed");
@@ -117,10 +121,10 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               <GlassButton size="sm" disabled={!!busy} onClick={() => act("rescore", () => rescoreLead(id), "Re-scored.")}>
                 {busy === "rescore" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />} Re-score
               </GlassButton>
-              <GlassButton size="sm" disabled={!!busy} onClick={() => act("docs", () => requestDocuments(id), "")}>
+              <GlassButton size="sm" disabled={!!busy} onClick={() => act("docs", () => requestDocuments(id), (r) => sentTo(r) ? `The documents have been sent to ${sentTo(r)}.` : "No new documents to request.")}>
                 {busy === "docs" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />} Request documents
               </GlassButton>
-              <GlassButton size="sm" disabled={!!busy} onClick={() => act("retainer", () => sendRetainer(id), "")}>
+              <GlassButton size="sm" disabled={!!busy} onClick={() => act("retainer", () => sendRetainer(id), (r) => sentTo(r) ? `The retainer has been sent to ${sentTo(r)}.` : "Retainer isn't ready to send.")}>
                 {busy === "retainer" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileSignature className="h-3.5 w-3.5" />} Send retainer
               </GlassButton>
               {flash ? <span className="text-xs text-muted-foreground">{flash}</span> : null}
