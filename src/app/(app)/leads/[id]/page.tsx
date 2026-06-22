@@ -137,6 +137,22 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             </Section>
           ) : null}
 
+          {/* Client & employment */}
+          <Section icon={Users} title="Client & employment">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <Field label="Date of birth" value={S(lead, "date_of_birth") ? fmtDate(S(lead, "date_of_birth")) : undefined} />
+              <Field label="Email" value={S(lead, "email")} />
+              <Field label="Phone" value={S(lead, "phone")} />
+              <Field label="Occupation" value={S(lead, "occupation")} />
+              <Field label="Employer" value={S(lead, "employer")} />
+              <Field label="Employment" value={S(lead, "employment_status")} />
+              <Field label="Annual income" value={N(lead, "annual_income") != null ? fmtCurrency(N(lead, "annual_income")) : undefined} />
+              <Field label="Preferred contact" value={S(lead, "preferred_contact_method")} />
+              <Field label="Best time to reach" value={S(lead, "best_time_to_contact")} />
+              <div className="col-span-2 sm:col-span-3"><Field label="Address" value={S(lead, "address")} /></div>
+            </div>
+          </Section>
+
           {/* Intelligence */}
           <Section icon={Scale} title="Lead intelligence">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -305,6 +321,15 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               </ul>
             )}
           </Section>
+
+          {/* Full call transcript */}
+          {d.transcript?.full_text ? (
+            <Section icon={MessageSquare} title="Call transcript">
+              <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted/40 p-3 text-xs leading-relaxed text-foreground/90">
+                {d.transcript.full_text}
+              </pre>
+            </Section>
+          ) : null}
         </>
       )}
     </div>

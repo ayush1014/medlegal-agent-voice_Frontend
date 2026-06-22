@@ -61,6 +61,7 @@ export interface LeadDetail {
   tasks: Record<string, unknown>[];
   messages: Record<string, unknown>[];
   timeline: Record<string, unknown>[];
+  transcript: { full_text?: string; status?: string; created_at?: string } | null;
 }
 
 export function getLeadDetail(id: string): Promise<LeadDetail> {
