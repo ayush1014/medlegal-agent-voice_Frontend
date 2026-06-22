@@ -7,6 +7,7 @@ import {
   Stethoscope, ShieldCheck, Users, Gavel, Scale, MessageSquare, Activity, ClipboardList, X,
 } from "lucide-react";
 import { ApiError, getLeadDetail, rescoreLead, requestDocuments, sendRetainer } from "@/lib/api";
+import { apiUrl } from "@/lib/api/client";
 import type { LeadDetail } from "@/lib/api";
 import { fmtCurrency, fmtCurrencyRange, fmtDate, fmtRelative } from "@/lib/format";
 import { GlassButton } from "@/components/ui/glass-button";
@@ -344,7 +345,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                       {d.documents.map((doc, i) => {
                         const docId = S(doc, "id");
                         const mime = S(doc, "mime_type");
-                        const href = docId ? `/api/leads/${id}/documents/${docId}/file` : undefined;
+                        const href = docId ? apiUrl(`/api/leads/${id}/documents/${docId}/file`) : undefined;
                         const conf = N(doc, "classification_confidence");
                         const ms = S(doc, "match_status");
                         const ex = doc["extracted"] && typeof doc["extracted"] === "object"
@@ -422,7 +423,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
       {viewerDoc ? (() => {
         const docId = S(viewerDoc, "id");
         const mime = S(viewerDoc, "mime_type");
-        const href = docId ? `/api/leads/${id}/documents/${docId}/file` : "";
+        const href = docId ? apiUrl(`/api/leads/${id}/documents/${docId}/file`) : "";
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
             onClick={() => setViewerDoc(null)}>

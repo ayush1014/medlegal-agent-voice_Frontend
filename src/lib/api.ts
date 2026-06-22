@@ -131,6 +131,26 @@ export function signMyRetainer(): Promise<unknown> {
   return apiFetch(`/api/portal/retainer/sign`, { method: "POST" });
 }
 
+// --- LOR e-sign (public magic-link flow) ----------------------------------
+
+export interface SignDoc {
+  firm: string;
+  client_name: string;
+  case_type: string;
+  lor_text: string;
+  status: string;
+  signed: boolean;
+  signer_name: string | null;
+}
+
+export function getSignDoc(code: string): Promise<SignDoc> {
+  return apiFetch<SignDoc>(`/api/sign/${code}`);
+}
+
+export function signDoc(code: string, signedName: string): Promise<{ status: string; already?: boolean }> {
+  return apiFetch(`/api/sign/${code}`, { method: "POST", body: { signed_name: signedName } });
+}
+
 // --- Analytics ------------------------------------------------------------
 
 export interface Analytics {

@@ -7,6 +7,12 @@ import { getOrgSlug } from "@/lib/org";
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
+// Absolute backend URL for resources the browser loads directly (e.g. an <img>/<iframe>
+// src that can't go through apiFetch). Uses the SAME base as apiFetch so the request's
+// cookies match the backend origin — NEXT_PUBLIC_API_BASE_URL in local dev, or relative
+// (the Next /api proxy) in production.
+export const apiUrl = (path: string): string => `${BASE}${path}`;
+
 // In-memory CSRF token. Recovered after a reload via GET /api/auth/csrf.
 let csrfToken: string | null = null;
 export function setCsrfToken(token: string | null): void {
