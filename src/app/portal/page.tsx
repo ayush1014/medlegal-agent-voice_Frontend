@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CheckCircle2, Clock, FileText, Loader2, Upload, FileSignature } from "lucide-react";
+import { CheckCircle2, Clock, FileText, Loader2, Upload, FileSignature, Activity, Gavel } from "lucide-react";
 import { getMyCase, uploadMyDocument, signMyRetainer, ApiError } from "@/lib/api";
 import type { PortalCase } from "@/lib/api";
 import { fmtDate, fmtRelative } from "@/lib/format";
@@ -94,6 +94,53 @@ export default function PortalPage() {
         </div>
       </section>
 
+      {/* Your case summary */}
+      {S(lead, "ai_summary") ? (
+        <section className="glass-card rounded-2xl p-5">
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <FileText className="h-4 w-4" /> Your case
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-foreground/90">{S(lead, "ai_summary")}</p>
+        </section>
+      ) : null}
+
+      {/* What happened */}
+      {data.incident ? (
+        <section className="glass-card rounded-2xl p-5">
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Gavel className="h-4 w-4" /> What happened
+          </h2>
+          {S(data.incident, "description") ? (
+            <p className="mt-2 text-sm leading-relaxed text-foreground/90">{S(data.incident, "description")}</p>
+          ) : null}
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
+            {S(data.incident, "incident_date") ? <span>Date: <span className="text-foreground">{fmtDate(S(data.incident, "incident_date"))}</span></span> : null}
+            {S(data.incident, "location_text") ? <span>Location: <span className="text-foreground">{S(data.incident, "location_text")}</span></span> : null}
+          </div>
+        </section>
+      ) : null}
+
+      {/* Your injuries */}
+      {data.injuries.length ? (
+        <section className="glass-card rounded-2xl p-5">
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Activity className="h-4 w-4" /> Your injuries
+          </h2>
+          <ul className="mt-3 space-y-1.5">
+            {data.injuries.map((inj, i) => (
+              <li key={i} className="flex items-center justify-between text-sm">
+                <span className="capitalize text-foreground">{S(inj, "body_part")}</span>
+                <span className="text-xs text-muted-foreground">
+                  {S(inj, "severity") ?? ""}
+                  {inj["requires_surgery"] ? " · surgery" : ""}
+                  {inj["is_permanent"] ? " · permanent" : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {/* Documents */}
       <section className="glass-card rounded-2xl p-5">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -132,7 +179,7 @@ export default function PortalPage() {
           </div>
         ) : null}
 
-        <div className="mt-4">
+        <div className="mt-4 flex">
           <input ref={fileRef} type="file" className="hidden" onChange={onUpload}
                  accept="image/*,application/pdf" />
           <GlassButton size="sm" disabled={!!busy} onClick={() => fileRef.current?.click()}>
@@ -151,7 +198,7 @@ export default function PortalPage() {
           Status: <RetainerBadge status={retainerStatus} />
         </div>
         {canSign ? (
-          <div className="mt-4">
+          <div className="mt-4 flex">
             <GlassButton size="sm" disabled={!!busy} onClick={onSign}>
               {busy === "sign" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileSignature className="h-3.5 w-3.5" />}
               Review &amp; sign your agreement

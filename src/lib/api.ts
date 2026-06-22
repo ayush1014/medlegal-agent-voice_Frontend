@@ -110,6 +110,8 @@ export function runFollowups(): Promise<{
 
 export interface PortalCase {
   lead: Record<string, unknown> | null;
+  incident: Record<string, unknown> | null;
+  injuries: Record<string, unknown>[];
   document_requests: Record<string, unknown>[];
   documents: Record<string, unknown>[];
   retainer: Record<string, unknown> | null;
