@@ -4,7 +4,7 @@ import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, Phone, Mail, CalendarDays, Loader2, RefreshCw, FileText, FileSignature,
-  Stethoscope, ShieldCheck, Users, Gavel, Scale, MessageSquare, Activity,
+  Stethoscope, ShieldCheck, Users, Gavel, Scale, MessageSquare, Activity, ClipboardList,
 } from "lucide-react";
 import { ApiError, getLeadDetail, rescoreLead, requestDocuments, sendRetainer } from "@/lib/api";
 import type { LeadDetail } from "@/lib/api";
@@ -136,6 +136,33 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               <p className="break-words text-sm leading-relaxed text-foreground/90">{S(lead, "ai_summary")}</p>
             </Section>
           ) : null}
+
+          {/* Attorney brief (internal — richer, sectioned synthesis) */}
+          {lead && typeof lead["case_brief"] === "object" && lead["case_brief"] ? (() => {
+            const b = lead["case_brief"] as Record<string, string>;
+            const rows: [string, string][] = [
+              ["Liability", "liability"],
+              ["Injuries & prognosis", "injuries"],
+              ["Damages & value", "damages"],
+              ["Representation", "representation"],
+              ["Recommended next step", "next_step"],
+            ];
+            const shown = rows.filter(([, k]) => b[k]);
+            if (!b.headline && shown.length === 0) return null;
+            return (
+              <Section icon={ClipboardList} title="Attorney brief">
+                {b.headline ? <p className="break-words text-sm font-medium text-foreground">{b.headline}</p> : null}
+                <div className="mt-3 grid gap-3">
+                  {shown.map(([label, k]) => (
+                    <div key={k}>
+                      <div className="text-xs text-muted-foreground">{label}</div>
+                      <p className="break-words text-sm text-foreground/90">{b[k]}</p>
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            );
+          })() : null}
 
           {/* Client & employment */}
           <Section icon={Users} title="Client & employment">
