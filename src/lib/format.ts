@@ -28,7 +28,10 @@ export function fmtNumber(n?: number): string {
 // Short human date: "Jun 12, 2026". Accepts an ISO string or undefined.
 export function fmtDate(iso?: string): string {
   if (!iso) return "—";
-  const d = new Date(iso);
+  // A date-only string ("YYYY-MM-DD") is parsed as UTC midnight by `new Date`, which
+  // shifts it a day earlier in negative-offset timezones. Parse those as LOCAL.
+  // Full timestamps (with time/zone) parse correctly as-is.
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T00:00:00`) : new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
   return d.toLocaleDateString("en-US", {
     month: "short",
