@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Users,
   BadgeCheck,
@@ -14,19 +14,21 @@ import {
 } from "lucide-react";
 import { Zap } from "lucide-react";
 import { getLeads, runFollowups, ApiError } from "@/lib/api";
+import { useLiveList } from "@/lib/hooks/use-live-list";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { LeadsTable } from "@/components/leads/leads-table";
 import { GlassButton } from "@/components/ui/glass-button";
 import type { LeadSummary } from "@/types/lead";
 
 export default function DashboardPage() {
-  const [leads, setLeads] = useState<LeadSummary[] | null>(null);
-  const [error, setError] = useState(false);
   const [running, setRunning] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
 
-  const load = () => getLeads().then(setLeads).catch(() => setError(true));
-  useEffect(() => { load(); }, []);
+  // Live pipeline: the lead table + KPI cards (derived below) refresh in the
+  // background and highlight changes — no hard reload to see new/updated leads.
+  const { data: leads, error, changedIds, refresh } = useLiveList<LeadSummary>(
+    () => getLeads(), [],
+  );
 
   async function onRunFollowups() {
     setRunning(true);
@@ -34,7 +36,7 @@ export default function DashboardPage() {
     try {
       const r = await runFollowups();
       setFlash(`Tick done — ${r.docs_requested} doc requests, ${r.retainers_sent} retainers, ${r.doc_nudges + r.retainer_nudges} nudges.`);
-      await load();
+      await refresh();
     } catch (e) {
       setFlash(e instanceof ApiError ? e.message : "Follow-up run failed");
     } finally {
@@ -102,7 +104,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <LeadsTable leads={leads} />
+      <LeadsTable leads={leads} changedIds={changedIds} />
     </div>
   );
 }

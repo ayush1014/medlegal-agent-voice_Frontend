@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { getLeads } from "@/lib/api";
+import { useLiveList } from "@/lib/hooks/use-live-list";
 import { LeadsTable } from "@/components/leads/leads-table";
 import {
   PIPELINE_STATUSES,
@@ -31,8 +32,6 @@ function Select({ value, onChange, all, options, aria }: {
 }
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<LeadSummary[] | null>(null);
-  const [error, setError] = useState(false);
   const [q, setQ] = useState("");
   const [pipeline, setPipeline] = useState("");
   const [qualification, setQualification] = useState("");
@@ -51,14 +50,11 @@ export default function LeadsPage() {
     [debouncedQ, pipeline, qualification, temperature, sort],
   );
 
-  useEffect(() => {
-    let alive = true;
-    setError(false);
-    getLeads(params)
-      .then((r) => { if (alive) setLeads(r); })
-      .catch(() => { if (alive) setError(true); });
-    return () => { alive = false; };
-  }, [params]);
+  // Live list: polls in the background (paused when the tab is hidden) and highlights
+  // rows that change — so a new call's lead appears + enriches without a hard reload.
+  const { data: leads, error, changedIds } = useLiveList<LeadSummary>(
+    () => getLeads(params), [params],
+  );
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
@@ -92,7 +88,7 @@ export default function LeadsPage() {
       ) : leads === null ? (
         <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       ) : (
-        <LeadsTable leads={leads} />
+        <LeadsTable leads={leads} changedIds={changedIds} />
       )}
     </div>
   );

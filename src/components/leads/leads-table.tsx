@@ -13,7 +13,16 @@ import {
 } from "@/components/leads/lead-badges";
 
 // Pure presentational table — filtering/sorting is owned by the page (server-side).
-export function LeadsTable({ leads, total }: { leads: LeadSummary[]; total?: number }) {
+// `changedIds` briefly highlights rows that just appeared/changed (live polling).
+export function LeadsTable({
+  leads,
+  total,
+  changedIds,
+}: {
+  leads: LeadSummary[];
+  total?: number;
+  changedIds?: Set<string>;
+}) {
   const router = useRouter();
 
   if (leads.length === 0) {
@@ -51,7 +60,7 @@ export function LeadsTable({ leads, total }: { leads: LeadSummary[]; total?: num
               <tr
                 key={l.id}
                 onClick={() => router.push(`/leads/${l.id}`)}
-                className="cursor-pointer border-t border-border/40 transition hover:bg-foreground/[0.03]"
+                className={`cursor-pointer border-t border-border/40 transition hover:bg-foreground/[0.03]${changedIds?.has(l.id) ? " lead-flash" : ""}`}
               >
                 <td className="px-5 py-3">
                   <div className="font-medium text-foreground">{l.fullName}</div>
@@ -82,7 +91,7 @@ export function LeadsTable({ leads, total }: { leads: LeadSummary[]; total?: num
       {/* ---- Mobile cards (< lg) ---- */}
       <ul className="divide-y divide-border/40 lg:hidden">
         {leads.map((l) => (
-          <li key={l.id}>
+          <li key={l.id} className={changedIds?.has(l.id) ? "lead-flash" : undefined}>
             <Link href={`/leads/${l.id}`} className="flex items-start gap-3 p-4 transition active:bg-foreground/[0.04]">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">

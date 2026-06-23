@@ -156,6 +156,18 @@ input:autofill { background-color: transparent !important; background-clip: cont
     inset 0 1px 0 0 oklch(from var(--background) l c h / 60%);
 }
 
+/* Brief highlight when a live-polled row appears or changes (leads/dashboard tables).
+   Fades a soft emerald wash to transparent, so the agent's lead enriching in place
+   (Caller +number → real name + score) is visible without a hard reload. */
+@keyframes lead-flash {
+  0%   { background-color: oklch(0.72 0.15 162 / 22%); }
+  100% { background-color: transparent; }
+}
+.lead-flash { animation: lead-flash 2.5s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .lead-flash { animation: none; }
+}
+
 /* ---- Animated gradient backdrop (blobs) ---- */
 @keyframes float1 {
   0%   { transform: translate(0px, 0px); }
