@@ -13,6 +13,10 @@ import { CASE_TYPES } from "@/lib/constants";
 
 type Step = "phone" | "code" | "details";
 
+// Firm intake line clients can call for immediate help (shown pre-login).
+const HELP_LINE = "+16075550100";
+const HELP_LINE_DISPLAY = "+1 (607) 555-0100";
+
 // One phone-first flow for clients: enter phone → OTP. If the number already has
 // a case, that's a login; if not, they continue to a short signup.
 export default function ClientAccessPage() {
@@ -172,6 +176,16 @@ export default function ClientAccessPage() {
               </GlassButton>
             </div>
           </form>
+        )}
+
+        {(step === "phone" || step === "code") && (
+          <a href={`tel:${HELP_LINE}`}
+            className="glass-control flex w-full flex-col items-center gap-0.5 rounded-2xl px-4 py-3 text-center">
+            <span className="relative z-10 text-xs text-muted-foreground">Seeking immediate help? Call us now</span>
+            <span className="relative z-10 flex items-center gap-2 font-medium text-foreground">
+              <Phone className="h-4 w-4 text-foreground/70" /> {HELP_LINE_DISPLAY}
+            </span>
+          </a>
         )}
 
         <Link href="/" className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
