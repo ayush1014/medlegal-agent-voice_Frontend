@@ -21,7 +21,11 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
+          // SAMEORIGIN (not DENY): still blocks other sites from framing the app
+          // (clickjacking), but lets the app embed its OWN same-origin resources —
+          // e.g. the in-UI document viewer iframes /api/leads/.../file (DENY made
+          // it "refused to connect"). Images use <img> and were unaffected.
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],

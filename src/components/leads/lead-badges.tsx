@@ -55,6 +55,17 @@ const PIPELINE: Record<PipelineStatus, string> = {
 };
 
 export function PipelineBadge({ status }: { status: PipelineStatus }) {
+  // "Intake Started" = the call ended and the AI is running post-call extraction +
+  // scoring (it flips to "Intake Complete" when done). Show it as an in-progress
+  // state so the admin sees the agent is working; live polling swaps it on completion.
+  if (status === "Intake Started") {
+    return (
+      <span className={cn(PILL, "bg-sky-50 text-sky-700 ring-sky-600/20 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-400/20")}>
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-500" />
+        Processing intake…
+      </span>
+    );
+  }
   return <span className={cn(PILL, PIPELINE[status])}>{status}</span>;
 }
 

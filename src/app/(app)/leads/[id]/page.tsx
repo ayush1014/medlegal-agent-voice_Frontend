@@ -169,6 +169,14 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             <Section icon={FileText} title="AI case summary">
               <p className="break-words text-sm leading-relaxed text-foreground/90">{S(lead, "ai_summary")}</p>
             </Section>
+          ) : S(lead, "pipeline_status") === "Intake Started" ? (
+            <Section icon={FileText} title="AI case summary">
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-sky-500" />
+                The AI is processing this intake — the summary, attorney brief, and case details
+                will appear here shortly. Refresh in a moment to see them.
+              </p>
+            </Section>
           ) : null}
 
           {/* Attorney brief (internal — richer, sectioned synthesis) */}
