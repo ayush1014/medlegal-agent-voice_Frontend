@@ -14,8 +14,8 @@ import { CASE_TYPES } from "@/lib/constants";
 type Step = "phone" | "code" | "details";
 
 // Firm intake line clients can call for immediate help (shown pre-login).
-const HELP_LINE = "+16075550100";
-const HELP_LINE_DISPLAY = "+1 (607) 555-0100";
+const HELP_LINE = "+16076956595";
+const HELP_LINE_DISPLAY = "+1 (607) 695-6595";
 
 // One phone-first flow for clients: enter phone → OTP. If the number already has
 // a case, that's a login; if not, they continue to a short signup.
