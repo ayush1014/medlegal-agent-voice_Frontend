@@ -19,7 +19,7 @@ const NAV: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/leads", label: "Leads", icon: Users },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/intake", label: "Intake", icon: PhoneCall },
+  // { href: "/intake", label: "Intake", icon: PhoneCall },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
